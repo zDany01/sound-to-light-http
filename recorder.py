@@ -8,7 +8,7 @@ class InputRecorder:
     """Simple, cross-platform class to record from the default input device."""
 
     def __init__(self, beatDetector):
-        self.RATE = 44100
+        self.RATE = 48000
         self.BUFFERSIZE = 2**10
         self.secToRecord = .1
         self.kill_threads = False
