@@ -1,6 +1,6 @@
 import random
 
-import osc
+import acc
 import ui
 import sys
 from PyQt5 import QtCore, QtWidgets
@@ -10,7 +10,7 @@ from recorder import *
 
 class BeatDetector:
     ui: ui.UserInterface
-    osc_client: osc.OscClient
+    acc_client: acc.ApplicationControlClient
     input_recorder: InputRecorder
     timer_period = int(round(1000 / (180 / 60) / 16))  # 180bpm / 16
 
@@ -39,7 +39,7 @@ class BeatDetector:
     def __init__(self, window) -> None:
         self.ui = ui.UserInterface(self.on_auto_prog_button_clicked, self.on_input_changed)
         self.ui.setup_ui(window)
-        self.osc_client = osc.OscClient("127.0.0.1", 2890)
+        self.acc_client = acc.ApplicationControlClient("127.0.0.1", 2890)
         self.auto_prog = False
 
         # Wire up beat detector and signal generation
@@ -67,7 +67,7 @@ class BeatDetector:
             if new_program != self.current_program:
                 print("Change program to {:d} for intensity {:d}".format(new_program, self.current_intensity))
                 self.current_program = new_program
-                self.osc_client.send_prog_signal(new_program)
+                self.acc_client.send_prog_signal(new_program)
             self.current_program_beats = 1
             self.change_program = False
 
@@ -93,7 +93,7 @@ class BeatDetector:
 
     def on_beat(self, beat_index):
         # print("beat")
-        self.osc_client.send_beat_signal()
+        self.acc_client.send_beat_signal()
         self.ui.change_beat_button_color()
         self.ui.display_beat_index(beat_index + 1)  # Starts with 0
 
@@ -106,7 +106,7 @@ class BeatDetector:
     def on_bar(self):
         # print("bar")
         self.change_program_if_needed()
-        self.osc_client.send_bar_signal()
+        self.acc_client.send_bar_signal()
         self.ui.change_bar_button_color()
 
     def on_new_song(self):
